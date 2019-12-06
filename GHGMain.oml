@@ -1,0 +1,6 @@
+%% Main function calling all subfunctions
+% 1) define constant parameters 
+% 2) load data 
+path('D:\ScienceHack\science-hack\data')
+fid = fopen('ChallengeData.xlxs','r')
+A = fscanf(fid, '%d, %f')
