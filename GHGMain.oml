@@ -1,7 +1,7 @@
 %% Main function calling all subfunctions
 % 1) define constant parameters 
 % 2) load data 
-
+clear all
 [A,B] = xlsread('ChallengeData.xlsx', 'KAYA PAST', 'A4:AU28');
 nameString = {'CO2 emissions'; 'Population'; 'GDP per population (GDP per capita)';...
 				'Energy intensity (TPES/GDP)';'Carbon intensity: ESCII (CO2/TPES)'};
@@ -23,8 +23,15 @@ for i=1:m
 end
 % Deleting unnecessary variables
 clear A B count k a m n
+
 %% Reading CO2-TPES
 [A,B] = xlsread('ChallengeData.xlsx', 'CO2-TPES', 'A6:AT19');
+[m n] = size(B);
+for i= 1:m
+	if ~isempty(B{i,1})
+		dataCO2tpes.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
+	end
+end	
 
 			
 			
