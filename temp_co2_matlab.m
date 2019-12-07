@@ -23,3 +23,4 @@ for i=2:45
 end
 plot (co2ppm)
 temp = 14.2+2*log2((co2ppm+326)/326)
+tempx = temp'
