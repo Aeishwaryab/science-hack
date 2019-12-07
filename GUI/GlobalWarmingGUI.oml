@@ -1,0 +1,101 @@
+clc,clear,close all
+
+global gui
+
+%path
+fpath = omlfilename('fullpath');
+ImPath = [fileparts(fpath),'\Images\'];
+%#########    main figure    #########
+gui.fig = figure('Name','Global Warming','units','normalized',...
+'position',[0 0 1 1]);
+undock,;
+
+%##########    plot area     ##########
+gui.axes = axes('units','normalized','position',[0.5 0.2 0.5 0.78]);
+ 
+%##########      frame 1     ###########
+gui.frame(1) = uicontrol('style','frame','units','normalized',...
+                   'position',[0 0.2 0.48 0.38]);
+%imshow([ImPath,'Orange.png'],'units','normalized','position',[0 0.2 0.48 0.38]);
+
+uicontrol(gui.frame(1),'style','text','string','Data File:','fontweight','bold',...
+	 'fontsize',14,'units','normalized','position',[0.05 0.1 0.16 0.06]);
+gui.edit.FileIn = uicontrol(gui.frame(1),'style','edit','fontsize',10,...
+	 'units','normalized','position',[0.2 0.08 0.65 0.1]);
+gui.btn.FileIn = uicontrol(gui.frame(1),'style','pushbutton','string',{'. . .'},...
+     'fontsize',14,'fontweight','bold','units','normalized','position',[0.85 0.08 0.05 0.1]);
+
+gui.txt.Param(1) = uicontrol(gui.frame(1),'style','text','string','param 1:',...
+	 'fontsize',12,'units','normalized','position',[0.05 0.34 0.16 0.06]);
+gui.edit.Param(1) = uicontrol(gui.frame(1),'style','edit','fontsize',10,...
+	 'units','normalized','position',[0.18 0.33 0.2 0.08]);
+gui.txt.Param(2) = uicontrol(gui.frame(1),'style','text','string','param 2:',...
+	 'fontsize',12,'units','normalized','position',[0.05 0.41 0.16 0.06]);
+gui.edit.Param(2) = uicontrol(gui.frame(1),'style','edit','fontsize',10,...
+	 'units','normalized','position',[0.18 0.4 0.2 0.08]); 
+
+% if there are more parameters:
+% gui.txt.Param(3) = 
+% gui.edit.Param(3) = 
+% gui.txt.Param(4) = 
+% gui.edit.Param(4) = 
+
+gui.btn.Compute = uicontrol(gui.frame(1),'style','pushbutton','fontsize',10,...
+	 'string','Set up Model','units','normalized','position',[0.05 0.7 0.2 0.15]); 
+
+gui.btngroup.Plot = uibuttongroup('string',{'Plot Option'},'fontweight','bold',...
+  'fontsize',14,'units','normalized','position',[0.3 0.32 0.15 0.14]);
+gui.btn.Plot(1) = uicontrol(gui.btngroup.Plot,'style','radiobutton','fontsize',10,...
+	 'string',{'CO2 emission'},'units','normalized'); 
+gui.btn.Plot(2) = uicontrol(gui.btngroup.Plot,'style','radiobutton','fontsize',10,...
+	 'string',{'Temperature'},'units','normalized'); 
+
+% gui.btn.Plot(3) =
+
+
+
+%##########      frame 2     ############	 
+gui.frame(2) = uicontrol('style','frame','units','normalized',...
+                   'position',[0 0.6 0.48 0.38]);
+%imshow([ImPath,'Blue.png'],'units','normalized','position',[0 0.6 0.48 0.38]);	
+	 
+gui.btn.Run = uicontrol(gui.frame(2),'style','pushbutton','fontsize',10,...
+	 'string','Simulate','units','normalized','position',[0.05 0.7 0.2 0.15]); 
+
+gui.btngroup.Forecast = uibuttongroup('string',{'Forcast mode'},'fontweight','bold',...
+  'fontsize',14,'units','normalized','position',[0.01 0.65 0.15 0.14]);
+gui.btn.Forecast(1) = uicontrol(gui.btngroup.Forecast,'style','radiobutton','fontsize',10,...
+	 'string',{'Random'},'units','normalized'); 
+gui.btn.Forecast(2) = uicontrol(gui.btngroup.Forecast,'style','radiobutton','fontsize',10,...
+	 'string',{'User Scenario'},'units','normalized'); 
+% gui.btn.Forecast(3) = 
+	 
+%###########  logos & title  ############
+uicontrol('style','text','string','Global Warming Forecast Tool',...
+	 'fontsize',40,'fontweight','bold','units','normalized','position',[0.25 0.04 0.5 0.1 ]);
+imshow([ImPath,'altair.png'],'units','normalized','position',[0.04 0.02 0.08 0.14]);
+imshow([ImPath,'TUMlogo.png'],'units','normalized','position',[0.8 0.02 0.16 0.14]);
+
+%##########     callbacks     #############
+set(gui.btn.Compute,'callback',@(h,data) SetUpModel(h,data));
+set(gui.btn.Run,'callback',@(h,data) RunScenario(h,data));
+set(gui.btn.FileIn,'callback',@(h,data) LoadFile(h,data));
+
+for ii = 1:length(gui.btn.Plot)
+   eval('set(gui.btn.Plot(ii),''callback'',@(h,data) RadioBtnCallBack(h,data))');
+end
+for ii = 1:length(gui.btn.Forecast)
+   eval('set(gui.btn.Forecast(ii),''callback'',@(h,data) RadioBtnCallBack(h,data))');
+end
+
+
+%##########       tag        #############
+PlotTags = {'CO2emission','Temperature'};
+for ii = 1:length(PlotTags)
+	eval('set(gui.btn.Plot(ii),''tag'',PlotTags{ii})');
+end
+
+ForecastTags = {'Random','User Scenario'};
+for ii = 1:length(PlotTags)
+	eval('set(gui.btn.Forecast(ii),''tag'',ForecastTags{ii})');
+end
