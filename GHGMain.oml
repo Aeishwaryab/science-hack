@@ -48,6 +48,32 @@ for i= 2:m
 		dataTPESpj.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
 	end
 end	
+[A,B] = xlsread('ChallengeData.xlsx', 'POP', 'A4:AT19');
+[m n] = size(B);
+dataPOP.year = A(1,2:end);
+for i= 2:m
+	if ~isempty(B{i,1})
+		dataPOP.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
+	end
+end	
+clear A B
+[A,B] = xlsread('ChallengeData.xlsx', 'GDP PPP', 'A4:AT19');
+[m n] = size(B);
+dataGDP.year = A(1,2:end);
+for i= 2:m
+	if ~isempty(B{i,1})
+		dataGDP.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
+	end
+end	
+
+%% Reference from 1990
+
+ref.pop = dataPOP.world(find(dataPOP.year == 1990))*1e4; % people
+ref.gdp =1e5*( dataGDP.world(find(dataGDP.year == 1990))/ref.pop); % USD per capita
+ref.ei = 1e4*dataTPESpj.world(find(dataTPESpj.year == 1990))/dataGDP.world(find(dataGDP.year == 1990)); % joule/US dollar
+ref.ci = dataCO2types.world(find(dataCO2types.year == 1990))*1e-11;   % kg / joule
+
+% Changing 
 clear A B m n a b
 dataTemp.year = xlsread('ChallengeData.xlsx', 'AverageGlobalTemp', 'A5:A143');
 dataTemp.temp = xlsread('ChallengeData.xlsx', 'AverageGlobalTemp', 'I5:I143');
@@ -58,19 +84,22 @@ b = find(dataTemp.year == dataCO2types.year(end));
 dataTemp.year = dataTemp.year(a:b);
 dataTemp.temp = dataTemp.temp(a:b);
 
-
 [optimRes] = getParamModel(dataTemp, data, dataCO2types, dataTPESpj, params, estimPara)
+
 resdata = optimModel(data, dataCO2types, dataTPESpj, params, optimRes)
+
 %% Fututre 
+
+
 [A1,B1] = xlsread('ChallengeData.xlsx', 'J1', 'B30:I30'); %CI
 [A2,B2] = xlsread('ChallengeData.xlsx', 'J2', 'B30:I30'); %EI
 [A3,B3] = xlsread('ChallengeData.xlsx', 'J3', 'B30:I30'); %GDP
 [A4,B4] = xlsread('ChallengeData.xlsx', 'J4', 'B30:I30'); %pop
 
-fut.samp.CI = A1(1,:);
-fut.samp.EI = A2(1,:);
-fut.samp.GDP = A3(1,:);
-fut.samp.P = A4(1,:);
+fut.samp.CI = A1(1,:)*(1e-9/1.055);
+fut.samp.EI = A2(1,:)* (1.055*1e6);
+fut.samp.GDP = A3(1,:) ;
+fut.samp.P = A4(1,:)*(1e6);
 fut.samp.years = [2015:5:2050];
 fut.years = [2015:2050];
 
@@ -80,10 +109,10 @@ fut.world.ei = interp1(fut.samp.years,fut.samp.EI,fut.years);
 fut.world.ci = interp1(fut.samp.years,fut.samp.CI,fut.years);
 
 %% All data
-datatempPredict.world.population = [data.world.population, fut.world.population(2:end)]; 
-datatempPredict.world.ei = [data.world.ei, fut.world.ei(2:end)];
-datatempPredict.world.ci = [data.world.ci, fut.world.ci(2:end)]; 
-datatempPredict.world.gdp = [data.world.gdp, fut.world.gdp(2:end)]; 
+datatempPredict.world.population = [data.world.population*ref.pop, fut.world.population(2:end)]; 
+datatempPredict.world.ei = [data.world.ei*ref.ei, fut.world.ei(2:end)];
+datatempPredict.world.ci = [data.world.ci*ref.ci, fut.world.ci(2:end)]; 
+datatempPredict.world.gdp = [data.world.gdp*ref.gdp, fut.world.gdp(2:end)]; 
 datatempPredict.year = [data.year,fut.years(2:end) ]
 
 
