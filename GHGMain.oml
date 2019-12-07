@@ -61,6 +61,34 @@ dataTemp.temp = dataTemp.temp(a:b);
 
 [optimRes] = getParamModel(dataTemp, data, dataCO2types, dataTPESpj, params, estimPara)
 resdata = optimModel(data, dataCO2types, dataTPESpj, params, optimRes)
+%% Fututre 
+[A1,B1] = xlsread('ChallengeData.xlsx', 'J1', 'B30:I30'); %CI
+[A2,B2] = xlsread('ChallengeData.xlsx', 'J2', 'B30:I30'); %EI
+[A3,B3] = xlsread('ChallengeData.xlsx', 'J3', 'B30:I30'); %GDP
+[A4,B4] = xlsread('ChallengeData.xlsx', 'J4', 'B30:I30'); %pop
+
+fut.samp.CI = A1(1,:);
+fut.samp.EI = A2(1,:);
+fut.samp.GDP = A3(1,:);
+fut.samp.P = A4(1,:);
+fut.samp.years = [2015:5:2050];
+fut.years = [2015:2050];
+
+fut.world.population = interp1(fut.samp.years,fut.samp.P,fut.years)
+fut.world.gdp = interp1(fut.samp.years,fut.samp.GDP,fut.years);
+fut.world.ei = interp1(fut.samp.years,fut.samp.EI,fut.years);
+fut.world.ci = interp1(fut.samp.years,fut.samp.CI,fut.years);
+
+%% All data
+datatempPredict.world.population = [data.world.population, fut.world.population(2:end)]; 
+datatempPredict.world.ei = [data.world.ei, fut.world.ei(2:end)];
+datatempPredict.world.ci = [data.world.ci, fut.world.ci(2:end)]; 
+datatempPredict.world.gdp = [data.world.gdp, fut.world.gdp(2:end)]; 
+datatempPredict.year = [data.year,fut.years(2:end) ]
+
+
+futTempPred = kayaPalat2(datatempPredict, params, optimRes)
+
 figure(1)
 plot(resdata.world.year, resdata.world.co2ea)
 grid on
@@ -71,3 +99,8 @@ hold on
 plot(dataTemp.year, dataTemp.temp)
 grid on
 legend('Estimated Values', 'Given')
+
+figure(3)
+plot(datatempPredict.year, futTempPred.world.temp)
+
+

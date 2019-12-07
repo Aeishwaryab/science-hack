@@ -1,4 +1,4 @@
-function resdata = kayaModel(data, params, estimParams)
+function [resdata] = kayaModel(data, params, estimParams)
 %load data.mat
 
 %% Loading data
@@ -8,9 +8,9 @@ function resdata = kayaModel(data, params, estimParams)
 
 % T_final = function(P,GDP,EI,CI)
 
-	Sen = estimPara(3);
-	tau = estimPara(2);
-	AF = estimPara(1);
+	Sen = estimParams(3);
+	tau = estimParams(2);
+	AF = estimParams(1);
 	toPPM= params.fixed(1);
 	CO20 = params.fixed(3);
 	T0 = params.fixed(2);
