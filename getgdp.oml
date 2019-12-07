@@ -1,0 +1,9 @@
+function [optimgdp] = getgdp(data,paragdp,gdppred)
+	x0 = [paragdp.a,paragdp.b];
+	options = optimset('Display', 'iter');
+	optimgdp = fmincon(@(paragdp)rmserr(data,paragdp,gdppred),x0,...
+				[], [],[],[], [], [], [], options); 
+end
+function err = rmserr(data, paragdp,gdppred)
+	err = sqrt(mean((gdppred-data.gdp).^2));
+end

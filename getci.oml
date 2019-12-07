@@ -1,0 +1,9 @@
+function [optimci] = getci(data,paraci,cipred)
+	x0 = [paraci.a,paraci.b,paraci.c];
+	options = optimset('Display', 'iter');
+	optimci = fmincon(@(paraci)rmserr(data,paraci,cipred),x0,...
+				[], [],[],[], [], [], [], options); 
+end
+function err = rmserr(data, paraci,cipred)
+	err = sqrt(mean((cipred-data.ci).^2));
+end
