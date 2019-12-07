@@ -1,4 +1,4 @@
-function [resdata] = kayaPalat2 (data,  params, estimParams)
+function [resdata] = kayaPalat2 (data,  params,ref estimParams)
 %load data.mat
 
 %% Loading data
@@ -11,10 +11,10 @@ function [resdata] = kayaPalat2 (data,  params, estimParams)
 	Sen = estimParams(3);
 	tau = estimParams(2);
 	AF = estimParams(1);
-	toPPM= params.fixed(1)*1e3;
+	toPPM= params.fixed(1);
 	CO20 = params.fixed(3);
 	T0 = params.fixed(2);
-	resdata.world.co2he = data.world.population.*data.world.gdp.*data.world.ei.*data.world.ci.*1e-8;
+	resdata.world.co2he = ref.co2he*data.world.population.*data.world.gdp.*data.world.ei.*data.world.ci.*1e-8;
 	resdata.world.co2ea = resdata.world.co2he *AF;
 	resdata.world.co2ppm = resdata.world.co2ea/toPPM;
 	resdata.world.co2ppmatm(1) = resdata.world.co2ppm(1)+ (CO20*exp(-1/tau));
