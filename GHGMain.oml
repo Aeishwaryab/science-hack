@@ -89,7 +89,7 @@ paraei.a = 3.855E-12
 paraei.b = 0.01963
 data.ei = xlsread('ChallengeData.xlsx', 'TPES PJ', 'B6:AT6')
 eipred = paraei.a*exp(paraei.b*data.year)
-[optimei] = getei(data,paraei,eipred)
+[optimei] = getei(data,paraei)
 eioptim = optimei(1)*exp(optimei(2)*data.year)
 figure(4)
 hold on
@@ -102,8 +102,7 @@ paraci.a = 0.008665
 paraci.b = -34.63
 paraci.c = 3.465E4
 data.ci = xlsread('ChallengeData.xlsx', 'CO2-TPES', 'B6:AT6')
-cipred = paraci.a*data.year.*data.year+paraci.b*data.year+paraci.c
-[optimci] = getci(data,paraci,cipred)
+[optimci] = getci(data,paraci)
 cioptim = optimci(1)*data.year.*data.year+optimci(2)*data.year+optimci(3)
 figure(5)
 hold on
