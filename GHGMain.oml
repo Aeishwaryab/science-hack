@@ -27,7 +27,7 @@ clear A B count k a m n
 %% Reading CO2-TPES
 [A,B] = xlsread('ChallengeData.xlsx', 'CO2-TPES', 'A4:AT19');
 [m n] = size(B);
-dataCO2types.year = A(i,2:end);
+dataCO2types.year = A(1,2:end);
 for i= 2:m
 	if ~isempty(B{i,1})
 		dataCO2types.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
