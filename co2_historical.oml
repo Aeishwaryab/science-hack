@@ -1,0 +1,17 @@
+kaya = xlsread('C:\Users\Thushara Addanki\Documents\GitHub\science-hack\ChallengeData.xlsx',1,'C6:AU6')
+ref_ei = xlsread('C:\Users\Thushara Addanki\Documents\GitHub\science-hack\ChallengeData.xlsx',4,'U6')
+ref_ci = xlsread('C:\Users\Thushara Addanki\Documents\GitHub\science-hack\ChallengeData.xlsx',5,'U6')
+co2he_ref = ref_ei*ref_ci/1E6
+co2he = kaya*co2he_ref/100
+co2ea = co2he*0.41
+co2ppm = co2ea/7.81
+co2ppm(1)=co2ppm(1)+326*exp(-1/1000)
+for i=2:45
+    co2ppm(i)=co2ppm(i-1)*exp(-1/1000)+co2ppm(i)
+end
+temp = 14.2+4*log2((co2ppm)/326)
+temp_ref = xlsread('C:\Users\Thushara Addanki\Documents\GitHub\science-hack\ChallengeData.xlsx',6,'I96:I140')
+fig_temp=figure
+hold on
+plot(temp)
+plot(temp_ref)
