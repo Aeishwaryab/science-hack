@@ -1,6 +1,0 @@
-function SetUpModel(h,data)
-   %this function is the callback of the "Set up Model" button
-   global gui
- 
- 
- end

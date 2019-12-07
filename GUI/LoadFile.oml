@@ -1,8 +1,0 @@
-function LoadFile(h,data)
-   %this function is the callback of the ... button
-   global gui
- 
- 
-  
-
- end
