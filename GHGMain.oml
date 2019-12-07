@@ -3,7 +3,7 @@
 % 2) load data 
 
 [A,B] = xlsread('ChallengeData.xlsx', 'KAYA PAST', 'A4:AU28');
-nameString = {'CO2 emissions'; 'Population'; 'GDP per population (GDP per captia)';...
+nameString = {'CO2 emissions'; 'Population'; 'GDP per population (GDP per capita)';...
 				'Energy intensity (TPES/GDP)';'Carbon intensity: ESCII (CO2/TPES)'};
 structString = {'co2';'population';'gdp';'ei';'ci'};
 [m,n] = size(B);
