@@ -2,4 +2,25 @@
 % 1) define constant parameters 
 % 2) load data 
 
-[A,B] = xlsread('ChallengeData.xlsx', 'KAYA PAST', 'A73:T78')
+[A,B] = xlsread('ChallengeData.xlsx', 'KAYA PAST', 'A4:AU28');
+nameString = {'CO2 emissions'; 'Population'; 'GDP per population (GDP per captia)';...
+				'Energy intensity (TPES/GDP)';'Carbon intensity: ESCII (CO2/TPES)'};
+structString = {'co2';'population';'gdp';'ei';'ci'};
+[m,n] = size(B);
+year = A(1,3:end);
+k = 1;
+a = 3;
+count = 0
+for i=1:m
+	if strcmp(B(i,2),nameString(k))
+		data.(B{a,1}).(structString{k})= A(i,3:end);
+		k = k+1;
+		if k ==6 
+			a = a+6;
+			k = 1;
+		end
+	end
+end
+		
+			
+			
