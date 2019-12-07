@@ -2,6 +2,12 @@
 % 1) define constant parameters 
 % 2) load data 
 clear all
+AF = 0.5;
+toPPM = 7.81;
+T0 = 14.2;
+CO20 = 326;
+Sen = 4;
+tau = 1000;
 [A,B] = xlsread('ChallengeData.xlsx', 'KAYA PAST', 'A4:AU28');
 nameString = {'CO2 emissions'; 'Population'; 'GDP per population (GDP per capita)';...
 				'Energy intensity (TPES/GDP)';'Carbon intensity: ESCII (CO2/TPES)'};
@@ -32,7 +38,36 @@ for i= 2:m
 	if ~isempty(B{i,1})
 		dataCO2types.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
 	end
+end
+[A,B] = xlsread('ChallengeData.xlsx', 'TPES PJ', 'A4:AT19');
+[m n] = size(B);
+dataTPESpj.year = A(1,2:end);
+for i= 2:m
+	if ~isempty(B{i,1})
+		dataTPESpj.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
+	end
 end	
+clear a
+a = find(dataCO2types.year == 1990);
+b = find(dataTPESpj.year == 1990);
+co2he_ref90 = dataCO2types.world(1,a)*dataTPESpj.world(1,b);
+resdata.world.year = dataCO2types.year;
+resdata.world.co2he = data.world.co2*co2he_ref90 * 10e-9;
+resdata.world.co2ea = resdata.world.co2he *AF;
+resdata.world.co2ppm = resdata.world.co2ea/toPPM;
+resdata.world.co2ppmatm(1) = resdata.world.co2ppm(1)+ (CO20*exp(-1/tau));
+%resdata.world.temp(1) = T0 + Sen*(resdata.world.co2ppmatm(1)/CO20);
+resdata.world.temp(1) = 14.2;
+for i = 2:length(resdata.world.co2ppm)
+	resdata.world.co2ppmatm(i) = resdata.world.co2ppmatm(i-1)*exp(-1/tau) + resdata.world.co2ppm(i);
+	resdata.world.temp(i) = T0 + Sen * log2(resdata.world.co2ppmatm(i)/CO20);
+end	
+figure(1)
+plot(resdata.world.year, resdata.world.co2ea)
+grid on
 
+figure(2)
+plot(resdata.world.year, resdata.world.temp)
+grid on
 			
 			
