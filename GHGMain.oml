@@ -2,6 +2,13 @@
 % 1) define constant parameters 
 % 2) load data 
 clear all
+close all
+params.fixed(1)= 7.81;  % toPPM
+params.fixed(2) = 14.2; % T0
+params.fixed(3) = 326;   % CO20
+estimPara(1) = 0.5;   % AF 
+estimPara(3) = 4;		% Sen
+estimPara(2) = 1000;   % tau
 [A,B] = xlsread('ChallengeData.xlsx', 'KAYA PAST', 'A4:AU28');
 nameString = {'CO2 emissions'; 'Population'; 'GDP per population (GDP per capita)';...
 				'Energy intensity (TPES/GDP)';'Carbon intensity: ESCII (CO2/TPES)'};
@@ -25,13 +32,42 @@ end
 clear A B count k a m n
 
 %% Reading CO2-TPES
-[A,B] = xlsread('ChallengeData.xlsx', 'CO2-TPES', 'A6:AT19');
+[A,B] = xlsread('ChallengeData.xlsx', 'CO2-TPES', 'A4:AT19');
 [m n] = size(B);
-for i= 1:m
+dataCO2types.year = A(1,2:end);
+for i= 2:m
 	if ~isempty(B{i,1})
-		dataCO2tpes.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
+		dataCO2types.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
+	end
+end
+[A,B] = xlsread('ChallengeData.xlsx', 'TPES PJ', 'A4:AT19');
+[m n] = size(B);
+dataTPESpj.year = A(1,2:end);
+for i= 2:m
+	if ~isempty(B{i,1})
+		dataTPESpj.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
 	end
 end	
+clear A B m n a b
+dataTemp.year = xlsread('ChallengeData.xlsx', 'AverageGlobalTemp', 'A5:A143');
+dataTemp.temp = xlsread('ChallengeData.xlsx', 'AverageGlobalTemp', 'I5:I143');
+%% Keeping only required temperature measurements 
 
-			
-			
+a = find(dataTemp.year == dataCO2types.year(1));
+b = find(dataTemp.year == dataCO2types.year(end));
+dataTemp.year = dataTemp.year(a:b);
+dataTemp.temp = dataTemp.temp(a:b);
+
+
+[optimRes] = getParamModel(dataTemp, data, dataCO2types, dataTPESpj, params, estimPara)
+resdata = optimModel(data, dataCO2types, dataTPESpj, params, optimRes)
+figure(1)
+plot(resdata.world.year, resdata.world.co2ea)
+grid on
+
+figure(2)
+plot(resdata.world.year, resdata.world.temp)
+hold on 
+plot(dataTemp.year, dataTemp.temp)
+grid on
+legend('Estimated Values', 'Given')

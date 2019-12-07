@@ -2,6 +2,8 @@ data.world.kaya = xlsread("ChallengeData.xlsx",1,'C6:AU6')
 data.ref.ei = xlsread("ChallengeData.xlsx",4,'U6')
 data.ref.ci = xlsread("ChallengeData.xlsx",5,'U6')
 co2he_ref = data.ref.ei*data.ref.ci/1E8
+
+
 co2he = data.world.kaya*co2he_ref
 % 
 % kayapast.world = xlsread("ChallengeData.xlsx",1,'C6:AU6')
@@ -13,6 +15,7 @@ co2he = data.world.kaya*co2he_ref
 
 co2ea = co2he*0.4
 plot(co2ea)
+
 co2ppm = co2ea/7.81
 plot(co2ppm)
 for i=2:45
