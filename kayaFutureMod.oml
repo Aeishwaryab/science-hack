@@ -1,0 +1,67 @@
+function [resdata] = kayaFutureMod(yr, f1_P, f_GDP, f_EI, f_CI)
+
+load('.\DataPresentation\fut.mat')
+% yr = 2025;
+% f_P = 1.2;
+% f_GDP = 1; 
+% f_EI = 1;
+% f_CI = 1;
+
+	Sen = 4.4499;
+	tau = 900.00314;
+	AF = 0.5;
+	toPPM= 7.81;
+	CO20 = 326;
+	T0 = 14.2;
+
+	% Interpolating using Reference data
+	fut.samp1.P 	= interp1(fut.samp.years,fut.samp.P,	fut.years);
+	fut.samp1.GDP 	= interp1(fut.samp.years,fut.samp.GDP,	fut.years);
+	fut.samp1.EI 	= interp1(fut.samp.years,fut.samp.EI,	fut.years);
+	fut.samp1.CI 	= interp1(fut.samp.years,fut.samp.CI,	fut.years);
+
+	resdata.world1.co2he = fut.samp1.P.*fut.samp1.GDP.*fut.samp1.EI.*fut.samp1.CI.*1e-9;
+	resdata.world1.co2ea = resdata.world1.co2he *AF;
+	resdata.world1.co2ppm = resdata.world1.co2ea/toPPM;
+	resdata.world1.co2ppmatm(1) = resdata.world1.co2ppm(1)+ (CO20*exp(-1/tau));
+	resdata.world1.temp(1) = 15.03;%14.2;
+	
+	for i = 2:length(resdata.world1.co2ppm)
+		resdata.world1.co2ppmatm(i) = resdata.world1.co2ppmatm(i-1)*exp(-1/tau) + resdata.world1.co2ppm(i);
+		resdata.world1.temp(i) = 15.03 + Sen * log2(resdata.world1.co2ppmatm(i)/CO20);
+	end
+		
+	%%% Changing ref data with factors
+	ind = find(fut.years == yr);
+	fut.samp.P = [fut.samp.P(1) fut.samp1.P(ind)*f_P];
+	fut.samp.GDP = [fut.samp.GDP(1) fut.samp1.GDP(ind)*f_GDP];
+	fut.samp.EI = [fut.samp.EI(1) fut.samp1.EI(ind)*f_EI];
+	fut.samp.CI = [fut.samp.CI(1) fut.samp1.CI(ind)*f_CI];	
+
+	fut.samp.years = [fut.samp.years(1) yr];		
+	fut.years = [2015:yr];
+
+	fut.world.population 	= interp1(fut.samp.years,fut.samp.P,	fut.years);
+	fut.world.gdp 			= interp1(fut.samp.years,fut.samp.GDP,	fut.years);
+	fut.world.ei 			= interp1(fut.samp.years,fut.samp.EI,	fut.years);
+	fut.world.ci 			= interp1(fut.samp.years,fut.samp.CI,	fut.years);
+		
+	resdata.world.co2he = fut.world.population.*fut.world.gdp.*fut.world.ei.*fut.world.ci.*1e-9;
+	resdata.world.co2ea = resdata.world.co2he *AF;
+	resdata.world.co2ppm = resdata.world.co2ea/toPPM;
+	resdata.world.co2ppmatm(1) = resdata.world.co2ppm(1)+ (CO20*exp(-1/tau));
+	resdata.world.temp(1) = 15.03;%14.2;
+	
+	for i = 2:length(resdata.world.co2ppm)
+		resdata.world.co2ppmatm(i) = resdata.world.co2ppmatm(i-1)*exp(-1/tau) + resdata.world.co2ppm(i);
+		resdata.world.temp(i) = 15.03 + Sen * log2(resdata.world.co2ppmatm(i)/CO20);
+	end	
+	
+	figure()
+	plot(fut.years, resdata.world1.temp(1:ind))
+	hold on
+	plot(fut.years, resdata.world.temp)
+	ylabel('Temperature prediction [°C]')
+	legend('Ref case','Mod case','Location','southeast')
+	
+end
