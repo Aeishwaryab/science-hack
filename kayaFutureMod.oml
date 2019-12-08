@@ -1,6 +1,12 @@
-function [resdata] = kayaFutureMod(yr, f1_P, f_GDP, f_EI, f_CI)
-
-load('.\DataPresentation\fut.mat')
+function kayaFutureMod(h, data)
+    global gui
+	cla();
+	yr = str2num(get(gui.edit.Param(1),'string'));
+	f_GDP = str2num(get(gui.edit.Param(4),'string'));
+	f_EI = str2num(get(gui.edit.Param(2),'string'));
+	f_CI = str2num(get(gui.edit.Param(3),'string'));
+	f_P = str2num(get(gui.edit.Param(5),'string'));
+	load('.\DataPresentation\fut.mat')
 % yr = 2025;
 % f_P = 1.2;
 % f_GDP = 1; 
@@ -57,10 +63,8 @@ load('.\DataPresentation\fut.mat')
 		resdata.world.temp(i) = 15.03 + Sen * log2(resdata.world.co2ppmatm(i)/CO20);
 	end	
 	
-	figure()
-	plot(fut.years, resdata.world1.temp(1:ind))
-	hold on
 	plot(fut.years, resdata.world.temp)
+	plot(fut.years, resdata.world1.temp(1:ind))
 	ylabel('Temperature prediction [°C]')
 	legend('Ref case','Mod case','Location','southeast')
 	

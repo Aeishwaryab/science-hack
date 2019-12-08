@@ -72,4 +72,4 @@ gui.btn.Compute(2) = uicontrol(gui.frame(2),'style','pushbutton','fontsize',10,.
 	 
 %##########     callbacks     #############
 set(gui.btn.Compute(1),'callback',@(h,data) GiveTempPred(h, data));
-set(gui.btn.Compute(2),'callback',@(h,data) GiveTempPred(h, data));
+set(gui.btn.Compute(2),'callback',@(h,data) kayaFutureMod(h, data));

@@ -1,11 +1,10 @@
 function GiveTempPred(h,data)
-% yr = 2025;
-	global gui
 
+	global gui
+	cla();
 
 	yr = str2num(get(gui.edit.Param(1),'string'));
 	if yr > 2050
-		cla();
 	errordlg('The year asked for is out of prediction range')
     else
 	load ('.\DataPresentation\datatempPredict.mat')
@@ -13,8 +12,7 @@ function GiveTempPred(h,data)
 	ind = find(datatempPredict.year == yr);
 	temp = [datatempPredict.temp(1:ind)];
 	
-	
-	
+
 	plot(year,temp);
 	
 		
