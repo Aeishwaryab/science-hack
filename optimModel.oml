@@ -1,0 +1,19 @@
+function resdata = optimModel(data, dataCO2types, dataTPESpj, params, ref,estimPara)
+	Sen = estimPara(3);
+	tau = estimPara(2);
+	AF = estimPara(1);
+	toPPM= params.fixed(1);
+	CO20 = params.fixed(3);
+	T0 = params.fixed(2);
+	resdata.world.year = dataCO2types.year;
+	resdata.world.co2he = data.world.co2*ref.co2he* 10e-9;
+	resdata.world.co2ea = resdata.world.co2he *AF;
+	resdata.world.co2ppm = resdata.world.co2ea/toPPM;
+	resdata.world.co2ppmatm(1) = resdata.world.co2ppm(1)+ (CO20*exp(-1/tau));
+	%resdata.world.temp(1) = T0 + Sen*(resdata.world.co2ppmatm(1)/CO20);
+	resdata.world.temp(1) = 14.2;
+	for i = 2:length(resdata.world.co2ppm)
+		resdata.world.co2ppmatm(i) = resdata.world.co2ppmatm(i-1)*exp(-1/tau) + resdata.world.co2ppm(i);
+		resdata.world.temp(i) = T0 + Sen * log2(resdata.world.co2ppmatm(i)/CO20);
+	end	
+end

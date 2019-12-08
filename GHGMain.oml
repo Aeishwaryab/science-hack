@@ -1,5 +1,153 @@
 %% Main function calling all subfunctions
 % 1) define constant parameters 
 % 2) load data 
+clear all
+[A,B] = xlsread('ChallengeData.xlsx', 'KAYA PAST', 'A4:AU28');
+nameString = {'CO2 emissions'; 'Population'; 'GDP per population (GDP per capita)';...
+				'Energy intensity (TPES/GDP)';'Carbon intensity: ESCII (CO2/TPES)'};
+structString = {'co2';'population';'gdp';'ei';'ci'};
+[m,n] = size(B);
+data.year = A(1,3:end);
+k = 1;
+a = 3;
+count = 0
+params.fixed(1) = 7.81;
+params.fixed(3)= 326;
+params.fixed(2)= 14.2;
+estimParams(1) = 0.45;
+estimParams(2) = 900;
+estimParams(3) = 2.5;
+for i=1:m
+	if strcmp(B(i,2),nameString(k))
+		data.(tolower(B{a,1}(~isspace(B{a,1})))).(structString{k})= A(i,3:end);
+		k = k+1;
+		if k ==6 
+			a = a+6;
+			k = 1;
+		end
+	end
+end
+% Deleting unnecessary variables
+clear A B count k a m n
 
-[A,B] = xlsread('ChallengeData.xlsx', 'KAYA PAST', 'A4:AM28')
+%% Reading CO2-TPES
+[A,B] = xlsread('ChallengeData.xlsx', 'CO2-TPES', 'A4:AT19');
+[m n] = size(B);
+dataCO2types.year = A(1,2:end);
+for i= 1:m
+	if ~isempty(B{i,1})
+		dataCO2types.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
+	end
+end	
+clear A B
+[A,B] = xlsread('ChallengeData.xlsx', 'GDP PPP', 'A4:AT19');
+[m n] = size(B);
+dataGDP.year = A(1,2:end);
+for i= 2:m
+	if ~isempty(B{i,1})
+		dataGDP.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
+	end
+end	
+%% Reading POP
+[A,B] = xlsread('ChallengeData.xlsx', 'TPES PJ', 'A4:AT19');
+[m n] = size(B);
+dataTPESpj.year = A(1,2:end);
+for i= 1:m
+	if ~isempty(B{i,1})
+		dataTPESpj.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
+	end
+end	
+clear A B
+[A,B] = xlsread('ChallengeData.xlsx', 'POP', 'A4:AT19');
+[m n] = size(B);
+dataPOP.year = A(1,2:end);
+for i= 1:m
+	if ~isempty(B{i,1})
+		dataPOP.(tolower(B{i,1}(~isspace(B{i,1})))) = A(i,2:end);
+	end
+end	
+clear A B
+%% Reference from 1990
+a = find(dataCO2types.year == 1990);
+b = find(dataTPESpj.year == 1990);
+ref.co2he = dataCO2types.world(1,a)*dataTPESpj.world(1,b);
+ref.pop = dataPOP.world(find(dataPOP.year == 1990))*1e4; % people
+ref.gdp =1e5*( dataGDP.world(find(dataGDP.year == 1990))/ref.pop); % USD per capita
+ref.ei = 1e4*dataTPESpj.world(find(dataTPESpj.year == 1990))/dataGDP.world(find(dataGDP.year == 1990)); % joule/US dollar
+ref.ci = dataCO2types.world(find(dataCO2types.year == 1990))*1e-11;   % kg / joule
+
+
+% Multiplying References
+
+% data.world.population = data.world.population*ref.pop;
+% data.world.ei = data.world.ei*ref.ei;
+% data.world.ci = data.world.ci*ref.ci;
+% data.world.gdp = data.world.gdp*ref.gdp;
+% Changing 
+clear A B m n a b
+dataTemp.year = xlsread('ChallengeData.xlsx', 'AverageGlobalTemp', 'A5:A143');
+dataTemp.temp = xlsread('ChallengeData.xlsx', 'AverageGlobalTemp', 'I5:I143');
+%% Keeping only required temperature measurements 
+
+a = find(dataTemp.year == dataCO2types.year(1));
+b = find(dataTemp.year == dataCO2types.year(end));
+dataTemp.year = dataTemp.year(a:b);
+dataTemp.temp = dataTemp.temp(a:b);
+
+[optimRes] = getParamModel(dataTemp, data, dataCO2types, dataTPESpj,ref, params, estimParams)
+
+%resdata = optimModel(data, dataCO2types, dataTPESpj, params, ref,optimRes)
+resdata = kayaPalat2(data, params, ref,optimRes)
+%% Fututre 
+
+
+[A1,B1] = xlsread('ChallengeData.xlsx', 'J1', 'B30:I30'); %CI
+[A2,B2] = xlsread('ChallengeData.xlsx', 'J2', 'B30:I30'); %EI
+[A3,B3] = xlsread('ChallengeData.xlsx', 'J3', 'B30:I30'); %GDP
+[A4,B4] = xlsread('ChallengeData.xlsx', 'J4', 'B30:I30'); %pop
+
+fut.samp.CI = A1(1,:);
+fut.samp.EI = A2(1,:);
+fut.samp.GDP = A3(1,:) ;
+fut.samp.P = A4(1,:);
+fut.samp.years = [2015:5:2050];
+fut.years = [2015:2050];
+
+fut.world.population = interp1(fut.samp.years,fut.samp.P,fut.years);
+fut.world.gdp = interp1(fut.samp.years,fut.samp.GDP,fut.years);
+fut.world.ei = interp1(fut.samp.years,fut.samp.EI,fut.years);
+fut.world.ci = interp1(fut.samp.years,fut.samp.CI,fut.years);
+
+resFuture = kayaFuture(fut, params, optimRes);
+
+%% All data
+% datatempPredict.world.population = [data.world.population, fut.world.population(2:end)]; 
+% datatempPredict.world.ei = [data.world.ei, fut.world.ei(2:end)];
+% datatempPredict.world.ci = [data.world.ci, fut.world.ci(2:end)]; 
+% datatempPredict.world.gdp = [data.world.gdp, fut.world.gdp(2:end)]; 
+datatempPredict.temp = [resdata.world.temp, resFuture.world.temp(2:end)];
+datatempPredict.year = [data.year,fut.years(2:end) ]
+
+
+%futTempPred = kayaPalat2(datatempPredict, params,ref, optimRes)
+
+figure(1)
+plot(data.year, resdata.world.co2ea)
+grid on
+
+figure(2)
+plot(data.year, resdata.world.temp)
+hold on 
+plot(dataTemp.year, dataTemp.temp)
+grid on
+legend('Estimated Values', 'Given')
+
+figure(3)
+plot(datatempPredict.year, datatempPredict.temp)
+grid on 
+title('Global Temperature predictions till 2050')
+
+
+
+			
+			
