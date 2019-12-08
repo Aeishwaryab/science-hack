@@ -1,12 +1,13 @@
-function [optimRes] = getParamModel(dataTemp, data, dataCO2types, dataTPESpj, params, estimPara)
+function [optimRes] = getParamModel(dataTemp, data, dataCO2types, dataTPESpj, ref,  params, estimPara)
 	x0 = [estimPara(1), estimPara(2), estimPara(3)];
 	options = optimset('Display', 'iter');
-	optimRes = fmincon(@(estimPara)rmsErr(dataTemp, data, dataCO2types, dataTPESpj, params, estimPara), x0,...
+	optimRes = fmincon(@(estimPara)rmsErr(dataTemp, data, dataCO2types, dataTPESpj, params,ref, estimPara), x0,...
 							[], [],[],[], [0.4, 200, 2], [0.5, 10000, 4.5], [], options); 
 	
 end
 
-function err = rmsErr( dataTemp, data, dataCO2types, dataTPESpj, params, estimPara)
-	resData = optimModel(data, dataCO2types, dataTPESpj, params, estimPara);
+function err = rmsErr( dataTemp, data, dataCO2types, dataTPESpj, params, ref,estimPara)
+	%resData = optimModel(data, dataCO2types, dataTPESpj, params,ref, estimPara);
+	resData = kayaPalat2(data,params,ref,estimPara);
 	err = sqrt(mean((dataTemp.temp-resData.world.temp').^2));
 end

@@ -1,0 +1,18 @@
+
+function [Temp] = GiveTempPred(yr)
+% yr = 2025;
+
+if yr > 2050
+	printf('The year asked for is out of prediction range')
+else
+	
+	load ('.\DataPresentation\datatempPredict.mat')
+	Array.year = [1971:yr];
+	ind = find(datatempPredict.year == yr);
+	Array.temp = [datatempPredict.temp(1:ind)];
+	Temp = Array.temp;
+	
+	% figure(1)
+	% plot(Array.year, Temp);
+end	
+end
