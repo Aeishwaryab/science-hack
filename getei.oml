@@ -1,0 +1,9 @@
+function [optimei] = getei(data,paraei,eipred)
+	x0 = [paraei.a,paraei.b];
+	options = optimset('Display', 'iter');
+	optimei = fmincon(@(paraei)rmserr(data,paraei,eipred),x0,...
+				[], [],[],[], [], [], [], options); 
+end
+function err = rmserr(data, paraei,eipred)
+	err = sqrt(mean((eipred-data.ei).^2));
+end
