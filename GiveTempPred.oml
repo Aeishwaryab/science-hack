@@ -1,11 +1,19 @@
+<<<<<<< HEAD
 % function [Temp] = GiveTempPred(yr)
 yr = 2050;
+=======
+function GiveTempPred(h,data)
 
-if yr > 2050
-	printf('The year asked for is out of prediction range')
-else
-	
+	global gui
+	cla();
+>>>>>>> 5800c66f4aba85bc8e9485bedc499ce3edbd5762
+
+	yr = str2num(get(gui.edit.Param(1),'string'));
+	if yr > 2050
+	errordlg('The year asked for is out of prediction range')
+    else
 	load ('.\DataPresentation\datatempPredict.mat')
+<<<<<<< HEAD
 	Array.year = [1971:yr];
 	ind1 = find(datatempPredict.year == yr);
 	Array.temp_ref = [datatempPredict.temp(1:ind1)];
@@ -22,6 +30,16 @@ else
 	plot(Array.year, Temp2); % trends from the data interpolations
 	ylabel('Temperature prediction [°C]')
 	legend('Ref case from data','Input paramters trend','Location','southeast')
+=======
+	year = [1971:yr];
+	ind = find(datatempPredict.year == yr);
+	temp = [datatempPredict.temp(1:ind)];
+	
+
+	plot(year,temp);
+	
+		
+>>>>>>> 5800c66f4aba85bc8e9485bedc499ce3edbd5762
 end	
 
 % end
