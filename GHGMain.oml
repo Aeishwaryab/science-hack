@@ -2,4 +2,4 @@
 % 1) define constant parameters 
 % 2) load data 
 
-[A,B] = xlsread('ChallengeData.xlsx', 'KAYA PAST', 'A73:T78')
+[A,B] = xlsread('ChallengeData.xlsx', 'KAYA PAST', 'A4:AM28')
