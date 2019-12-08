@@ -89,7 +89,7 @@ paraei.a = 3.855E-12
 paraei.b = 0.01963
 data.ei = xlsread('ChallengeData.xlsx', 'TPES PJ', 'B6:AT6')
 eipred = paraei.a*exp(paraei.b*data.year)
-[optimei] = getei(data,paraei)
+[optimei] = getei(data,paraei,eipred)
 eioptim = optimei(1)*exp(optimei(2)*data.year)
 figure(4)
 hold on
