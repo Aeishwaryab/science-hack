@@ -1,1 +1,16 @@
 Science Hack
+
+
+This folder contains application developed during two days of the Science Hack organised by TUM Junge Academie.
+The challenge was provided by Altair and the entire platform is developed in Altair Compose. 
+Although the language is quite similar to MATLAB and hence the code can be easily adapted. 
+
+Problem Statement: To implement a global average temperature calculation model using the past data and make predictions for the future. 
+
+Given: Data-set in file 'ChallengeData.xlsx'
+
+Solution: (Back-end / logic) GHGMain.oml 
+          (Front-end / GUI)  OurGui.oml
+        
+ You can also find the final presentation and see the GUI in action. 
+          
